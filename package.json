@@ -1,14 +1,16 @@
 {
   "name": "@xanter/vue-smooth-dnd",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
+  "license": "MIT",
   "scripts": {
     "dev": "vite",
     "build": "run-p type-check build-only",
     "preview": "vite preview",
     "build-only": "vite build && vue-tsc -p ./tsconfig.build.json --emitDeclarationOnly",
     "type-check": "vue-tsc -p ./tsconfig.build.json --noEmit",
-    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix"
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix",
+    "prepack": "yarn run build"
   },
   "files": [
     "dist"

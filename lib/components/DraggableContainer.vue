@@ -5,22 +5,33 @@
 <script lang="ts" setup>
 /* eslint-disable vue/require-default-prop */
 
-import { onMounted, onUnmounted, ref } from 'vue'
-import {
-  smoothDnD,
-  dropHandlers,
-  type SmoothDnD,
-  type ContainerOptions,
-  type DropPlaceholderOptions,
-  type DragStartParams,
-  type DropResult,
-  type DragEndParams,
-} from 'smooth-dnd'
+import { onMounted, onUnmounted, ref, watch } from 'vue'
+import { smoothDnD, dropHandlers, type SmoothDnD, type ContainerOptions, type DropPlaceholderOptions } from 'smooth-dnd'
 import { omitUndefined } from '../utils/omitUndefined'
+
+export interface DropResult<T = any> {
+  removedIndex: number | null
+  addedIndex: number | null
+  payload?: T
+  element?: HTMLElement
+}
+
+export interface DragStartParams<T = any> {
+  isSource: boolean
+  payload: T
+  willAcceptDrop: boolean
+}
+
+export interface DragEndParams<T = any> {
+  isSource: boolean
+  payload: T
+  willAcceptDrop: boolean
+}
 
 export interface DraggableContainerProps {
   /**
    * Tag name or the node definition to render the root element of the `DraggableContainer`.
+   *
    * @default div
    * */
   tag?: string
@@ -190,10 +201,10 @@ let dnd: SmoothDnD | null = null
 smoothDnD.dropHandler = dropHandlers.reactDropHandler().handler
 smoothDnD.wrapChild = false
 
-onMounted(() => {
+function init() {
   const el = containerRef.value
   if (!el) {
-    throw Error('containerRef is not exists')
+    return
   }
   const options: ContainerOptions = {
     behaviour: props.behavior,
@@ -222,8 +233,16 @@ onMounted(() => {
     onDrop: (params) => emit('drop', params),
     onDropReady: (params) => emit('drop-ready', params),
   }
-
+  dnd?.dispose()
   dnd = smoothDnD(el, omitUndefined(options))
+}
+
+onMounted(() => {
+  init()
+})
+
+watch([props, containerRef], () => {
+  init()
 })
 
 onUnmounted(() => {
