@@ -3,6 +3,8 @@
 </template>
 
 <script lang="ts" setup>
+/* eslint-disable vue/require-default-prop */
+
 import { onMounted, onUnmounted, ref } from 'vue'
 import {
   smoothDnD,
@@ -14,6 +16,7 @@ import {
   type DropResult,
   type DragEndParams,
 } from 'smooth-dnd'
+import { omitUndefined } from '../utils/omitUndefined'
 
 export interface DraggableContainerProps {
   /**
@@ -95,7 +98,7 @@ export interface DraggableContainerProps {
   /**
    * Options for drop placeholder. **className**, **animationDuration**, **showOnTop**
    */
-  dropPlaceholder?: DropPlaceholderOptions | boolean
+  dropPlaceholder?: DropPlaceholderOptions
   /**
    * The function to be called to get the payload object to be passed onDrop function.
    *
@@ -137,42 +140,49 @@ export interface DraggableContainerProps {
   getGhostParent?: () => HTMLElement
 }
 
-export interface DraggableContainerEmit {
+export interface DraggableContainerEvents {
   /**
    * Event to be emitted by all containers on drag start.
    */
-  (e: 'drag-start', payload: DragStartParams): void
+  onDragStart: (payload: DragStartParams) => void
   /**
    * The function to be called by all containers on drag end. Called before `drop` event.
    */
-  (e: 'drag-end', payload: DragEndParams): void
+  onDragEnd: (payload: DragEndParams) => void
   /**
    * The event to be emitted by the relevant container whenever a dragged item enters its boundaries while dragging.
    */
-  (e: 'drag-enter'): void
+  onDragEnter: () => void
   /**
    * The event to be emitted by the relevant container whenever a dragged item leaves its boundaries while dragging.
    */
-  (e: 'drag-leave'): void
+  onDragLeave: () => void
   /**
    * The event to be emitted by any relevant container when drop is over. (After drop animation ends).
    * Source container and any container that could accept drop is considered relevant.
    */
-  (e: 'drop', payload: DropResult): void
+  onDrop: (payload: DropResult) => void
   /**
    * The function to be called by the container which is being drag over, when the index of possible drop position
    * changed in container. Basically it is called each time the draggable items in a container slides
    * for opening a space for dragged item. **dropResult** is the only parameter passed to the function
    * which contains the following properties.
    */
-  (e: 'drop-ready', payload: DropResult): void
+  onDropReady: (payload: DropResult) => void
 }
 
 const props = withDefaults(defineProps<DraggableContainerProps>(), {
   tag: 'div',
 })
 
-const emit = defineEmits<DraggableContainerEmit>()
+const emit = defineEmits<{
+  (e: 'drag-start', payload: DragStartParams): void
+  (e: 'drag-end', payload: DragEndParams): void
+  (e: 'drag-enter'): void
+  (e: 'drag-leave'): void
+  (e: 'drop', payload: DropResult): void
+  (e: 'drop-ready', payload: DropResult): void
+}>()
 
 const containerRef = ref<HTMLElement>()
 let dnd: SmoothDnD | null = null
@@ -185,7 +195,7 @@ onMounted(() => {
   if (!el) {
     throw Error('containerRef is not exists')
   }
-  dnd = smoothDnD(el, {
+  const options: ContainerOptions = {
     behaviour: props.behavior,
     groupName: props.groupName,
     orientation: props.orientation,
@@ -211,7 +221,9 @@ onMounted(() => {
     onDragLeave: () => emit('drag-leave'),
     onDrop: (params) => emit('drop', params),
     onDropReady: (params) => emit('drop-ready', params),
-  })
+  }
+
+  dnd = smoothDnD(el, omitUndefined(options))
 })
 
 onUnmounted(() => {

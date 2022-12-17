@@ -5,7 +5,7 @@
 </template>
 
 <script lang="ts" setup>
-import { constants } from "smooth-dnd";
+import { constants } from 'smooth-dnd'
 
 withDefaults(
   defineProps<{
@@ -13,10 +13,10 @@ withDefaults(
      * Tag
      * @default div
      * */
-    tag?: string;
+    tag?: string
   }>(),
   {
-    tag: "div",
-  }
-);
+    tag: 'div',
+  },
+)
 </script>

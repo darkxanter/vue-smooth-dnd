@@ -1,41 +1,42 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { DraggableContainer, DraggableItem } from '../lib'
+import CardBoard from './components/CardBoard.vue'
 
-type Status = 'new' | 'in-progress' | 'done'
+// type Status = 'new' | 'in-progress' | 'done'
 
-type KanbanItem = {
-  id: number
-  name: string
-  status: Status
-}
+// type KanbanItem = {
+//   id: number
+//   name: string
+//   status: Status
+// }
 
-const items = ref<KanbanItem[]>(
-  Array.from({ length: 5 }, (_, i) => ({
-    id: i,
-    name: `Item ${i}`,
-    status: 'new',
-  })),
-)
+// const items = ref<KanbanItem[]>(
+//   Array.from({ length: 5 }, (_, i) => ({
+//     id: i,
+//     name: `Item ${i}`,
+//     status: 'new',
+//   })),
+// )
 
-const itemsByStatus = computed(() =>
-  items.value.reduce(
-    (acc, item) => {
-      acc[item.status].push(item)
-      return acc
-    },
-    {
-      'new': [],
-      'in-progress': [],
-      'done': [],
-    } as Record<Status, KanbanItem[]>,
-  ),
-)
+// const itemsByStatus = computed(() =>
+//   items.value.reduce(
+//     (acc, item) => {
+//       acc[item.status].push(item)
+//       return acc
+//     },
+//     {
+//       'new': [],
+//       'in-progress': [],
+//       'done': [],
+//     } as Record<Status, KanbanItem[]>,
+//   ),
+// )
 </script>
 
 <template>
   <main>
-    <div class="board">
+    <card-board />
+    <!-- <simple-example /> -->
+    <!-- <div class="board">
       <draggable-container
         v-for="[status, items] in Object.entries(itemsByStatus)"
         :key="status"
@@ -52,7 +53,7 @@ const itemsByStatus = computed(() =>
     <hr />
     <ul>
       <li v-for="item in items" :key="item.id">{{ item.name }} - {{ item.status }}</li>
-    </ul>
+    </ul> -->
   </main>
 </template>
 
